@@ -34,13 +34,12 @@ metadata_startup_script = data.template_file.userdata_jenkins_worker_linux.rende
 
 data "template_file" "userdata_jenkins_worker_linux" {
   template   = file("scripts/jenkins-node.sh")
-  depends_on = [module.jenkins_master, module.firewall-rules, null_resource.install_plugin]
+  depends_on = [module.jenkins_master, module.firewall-rules, null_resource.install_plugin,module.jenkins-password,module.jenkins-bcrypt-password]
 
   vars = {
     jenkins_url      = module.jenkins_master.external_ip
     jenkins_username = "admin"
-    #jenkins_password = module.jenkins-password.jenkins_password_secret_version
-    jenkins_password="password"
+    jenkins_password = module.jenkins-password.jenkins_password_secret_version
     device_name      = "ens4"
     worker_pem       = tls_private_key.jenkins_master_key.private_key_pem
   }

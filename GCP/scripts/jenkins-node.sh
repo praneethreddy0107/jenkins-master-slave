@@ -15,6 +15,8 @@ sudo apt-get install -y git
 
 # Sleep to allow Jenkins to start properly (if needed)
 sudo sleep 120
+echo "jenkins password from secret"
+echo $jenkins_password
 
 function slave_setup() {
     ret=1

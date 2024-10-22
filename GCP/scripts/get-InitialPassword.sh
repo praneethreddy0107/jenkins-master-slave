@@ -5,11 +5,19 @@ set -x  # Enable debugging output
 
 
 # Fetch Jenkins admin password from GCP Secret Manager
-# jenkins_admin_password=$(gcloud secrets versions access latest --secret="jenkins-admin-password")
-# if [[ -z "$jenkins_admin_password" ]]; then
-#     echo "Error: Failed to fetch Jenkins admin password from Secret Manager."
-#     exit 1
-# fi
+jenkins_admin_password=$(gcloud secrets versions access latest --secret="jenkins-admin-password")
+# Bcrypt hashed password (ensure this is already hashed)
+
+admin_password=$(gcloud secrets versions access latest --secret="jenkins-bcrypt-password")
+
+if [[ -z "$jenkins_admin_password" ]]; then
+    echo "Error: Failed to fetch Jenkins admin password from Secret Manager."
+    exit 1
+fi
+if [[ -z "$admin_password" ]]; then
+    echo "Error: Failed to fetch Jenkins bcrypt password from Secret Manager."
+    exit 1
+fi
 ### Function: Wait for Jenkins to be available on port 8080 ###
 wait_for_jenkins() {
     while true; do
@@ -41,14 +49,12 @@ updating_jenkins_master_password() {
     fi
 
     sleep 10
-done
+   done
 
 
     echo "Admin config file created."
 
-    # Bcrypt hashed password (ensure this is already hashed)
-    admin_password='$2a$10$1LOKaTM.4BdGvju2LsLK4ulAmLrDPr1xbegLVc1RIv9klz5q9TrZO'
-
+    
     # Update the password hash in the config.xml for the admin user
     # We use xmlstarlet to edit the XML file in-place
     xmlstarlet ed --inplace -u "/user/properties/hudson.security.HudsonPrivateSecurityRealm_-Details/passwordHash" -v '#jbcrypt:'"$admin_password" config.xml
@@ -70,9 +76,8 @@ configure_jenkins_server() {
         exit 1
     fi
 
-    jenkins_admin_password="password"  # Replace with actual password if needed
     
-    PASSWORD="${jenkins_admin_password}"
+   PASSWORD="${jenkins_admin_password}"
     jenkins_dir="/var/lib/jenkins"
     plugins_dir="$jenkins_dir/plugins"
 

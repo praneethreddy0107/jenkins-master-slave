@@ -36,6 +36,6 @@ output "jenkins_username" {
 # Output the Jenkins password (if applicable)
 output "jenkins_password" {
   description = "The password for the Jenkins Slave instance"
-  value       = "password"  # Replace this with the actual password variable if applicable
+  value       = module.jenkins-password.jenkins_password_secret_version  # Replace this with the actual password variable if applicable
   sensitive   = true  # Mark this output as sensitive
 }

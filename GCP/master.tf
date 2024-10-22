@@ -13,7 +13,6 @@ module "jenkins_master" {
   min_cpu_platform = var.min_cpu_platform
   options          = var.options
   enable_display   = var.enable_display
-
   labels           = var.labels
   metadata = {
     ssh-keys = "ubuntu:${tls_private_key.jenkins_master_key.public_key_openssh}"
@@ -58,7 +57,7 @@ resource "null_resource" "setup_jenkins" {
 }
 # null resource 
 resource "null_resource" "install_plugin" {
-  depends_on = [module.jenkins_master, null_resource.setup_jenkins]
+  depends_on = [module.jenkins_master, null_resource.setup_jenkins,module.jenkins-password,module.jenkins-bcrypt-password]
   connection {
     host        = coalesce(module.jenkins_master.external_ip, module.jenkins_master.internal_ip)
     type        = "ssh"

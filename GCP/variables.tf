@@ -202,7 +202,7 @@ variable "shielded_config" {
 variable "enable_public_ip" {
   description = "Flag to enable or disable public IP for the instance."
   type        = bool
-  default     = false  # Set the default value to false, meaning no public IP by default
+  default     = false # Set the default value to false, meaning no public IP by default
 }
 
 variable "rules" {
@@ -237,18 +237,18 @@ variable "rules" {
 
   # Validation block for 'direction'
   validation {
-    condition = alltrue([for rule in var.rules : contains(["INGRESS", "EGRESS"], rule.direction)])
+    condition     = alltrue([for rule in var.rules : contains(["INGRESS", "EGRESS"], rule.direction)])
     error_message = "Direction must be either 'INGRESS' or 'EGRESS'."
   }
 
   # Validation block for 'protocol' in allow and deny
   validation {
-    condition = alltrue([for rule in var.rules : alltrue([for protocol in rule.allow : contains(["ah", "all", "esp", "icmp", "ipip", "sctp", "tcp", "udp"], protocol.protocol)])])
+    condition     = alltrue([for rule in var.rules : alltrue([for protocol in rule.allow : contains(["ah", "all", "esp", "icmp", "ipip", "sctp", "tcp", "udp"], protocol.protocol)])])
     error_message = "Allowed protocols in 'allow' must be one of: 'ah', 'all', 'esp', 'icmp', 'ipip', 'sctp', 'tcp', 'udp'."
   }
 
   validation {
-    condition = alltrue([for rule in var.rules : alltrue([for protocol in rule.deny : contains(["ah", "all", "esp", "icmp", "ipip", "sctp", "tcp", "udp"], protocol.protocol)])])
+    condition     = alltrue([for rule in var.rules : alltrue([for protocol in rule.deny : contains(["ah", "all", "esp", "icmp", "ipip", "sctp", "tcp", "udp"], protocol.protocol)])])
     error_message = "Allowed protocols in 'deny' must be one of: 'ah', 'all', 'esp', 'icmp', 'ipip', 'sctp', 'tcp', 'udp'."
   }
 }
@@ -256,6 +256,13 @@ variable "rules" {
 # Variable for the Jenkins password
 variable "jenkins_password" {
   description = "The Jenkins admin password to be securely stored in Google Secret Manager"
+  type        = string
+  sensitive   = true
+}
+
+# Bcrypt hashed password (ensure this is already hashed)
+variable "jenkins_bcrypt_password" {
+  description = "The Jenkins Bcrypt hashed password (ensure this is already hashed)"
   type        = string
   sensitive   = true
 }
