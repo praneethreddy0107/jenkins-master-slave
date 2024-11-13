@@ -59,6 +59,7 @@ resource "google_compute_instance" "instance" {
       network_ip = try(config.value.addresses.internal, null)
       nic_type   = config.value.nic_type
       stack_type = config.value.stack_type
+      subnetwork_project = var.project_id
       dynamic "access_config" {
         for_each = var.enable_public_ip || config.value.nat ? [""] : []
         content {
