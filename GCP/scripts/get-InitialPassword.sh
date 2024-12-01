@@ -84,18 +84,21 @@ configure_jenkins_server() {
     # Ensure plugins directory exists
     cd $plugins_dir || { echo "Unable to change directory to [$plugins_dir]"; exit 1; }
 
-    # List of plugins to install
-    plugin_list="git-client git github-api github-oauth github ssh-slaves workflow-aggregator ws-cleanup"
+
+     # List of plugins to install
+plugin_list="git-client git github-api github-oauth github ssh-slaves workflow-aggregator ws-cleanup maven-plugin docker-plugin kubernetes  sonar nexus-artifact-uploader nexus-artifact-uploader google-kubernetes-engine configuration-as-code"
 
     # Clean up any existing plugins
     echo "Removing any existing plugins: $plugin_list ..."
     rm -rfv $plugin_list
 
     # Install each plugin using Jenkins CLI
+   
     for plugin in $plugin_list; do
         echo "Installing plugin [$plugin] ..."
         java -jar $jenkins_dir/jenkins-cli.jar -s http://127.0.0.1:8080/ -auth admin:$PASSWORD install-plugin $plugin
     done
+   
 
     # Safe restart Jenkins after installing the plugins
     echo "Restarting Jenkins after plugin installation..."
