@@ -55,6 +55,37 @@ resource "null_resource" "setup_jenkins" {
 
   }
 }
+#===========================================
+resource "null_resource" "tools_install" {
+  depends_on = [null_resource.install_plugin]
+  connection {
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = tls_private_key.jenkins_master_key.private_key_pem
+    host        =  coalesce(module.jenkins_master.external_ip,module.jenkins_master.internal_ip)
+   # host = module.jenkins_master.external_ip
+  }
+  provisioner "file" {
+    source      = "scripts/install-tools.sh"
+    destination = "/tmp/install-tools.sh"
+
+
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/install-tools.sh",
+      "sudo sh -x /tmp/install-tools.sh",
+    ] # Execute main.sh within the directory
+
+
+  }
+  
+}
+
+
+
+
 # null resource 
 resource "null_resource" "install_plugin" {
   depends_on = [module.jenkins_master, null_resource.setup_jenkins,module.jenkins-password,module.jenkins-bcrypt-password]
